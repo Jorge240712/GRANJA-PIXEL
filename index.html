@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Granja de Herencia Pixel</title>
+  <meta name="description" content="Juego educativo de granja retro — aprende herencia OOP cultivando." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+
+<!-- ═══════ HUD SUPERIOR ═══════════════════════════════════════ -->
+<header id="hud-superior">
+  <div class="hud-izquierda">
+    <img src="images/decorados/herramientas.webp" alt="Herramientas" class="hud-icono-img" />
+    <h1 class="hud-titulo">Granja Pixel</h1>
+  </div>
+
+  <div class="hud-stats">
+    <div class="stat-chip" id="btn-toggle-sonido" style="cursor: pointer; user-select: none;" title="Mute / Unmute Sonido">
+      <span class="stat-icono" id="icono-sonido">🔊</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-icono">🪙</span>
+      <span class="stat-valor" id="hud-oro">50</span>
+      <span class="stat-nombre">ORO</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-icono">🌾</span>
+      <span class="stat-valor" id="hud-total-cosechado">0</span>
+      <span class="stat-nombre">COSECHADO</span>
+    </div>
+  </div>
+
+  <div class="hud-mejoras">
+    <span class="mejora-chip" title="Aspersores">💧 <span id="cnt-aspersores">0</span></span>
+    <span class="mejora-chip" title="Fertilizante">🌿 <span id="cnt-fertilizante">0</span></span>
+    <span class="mejora-chip" title="Super-Suelo">⭐ <span id="cnt-supersuelo">0</span></span>
+  </div>
+</header>
+
+<!-- ═══════ ESCENA PRINCIPAL (fondo + campos) ════════════════════ -->
+<main id="escena-principal">
+
+  <!-- Fondo decorativo -->
+  <div id="fondo-granja" aria-hidden="true">
+    <img src="images/decorados/arbol_1.webp"  alt="" class="deco deco-arbol-iz1" />
+    <img src="images/decorados/arbol_2.webp"  alt="" class="deco deco-arbol-iz2" />
+    <img src="images/decorados/silo.webp"     alt="Silo"    class="deco deco-silo" />
+    <img src="images/decorados/granja.webp"   alt="Granja"  class="deco deco-granja" />
+    <img src="images/decorados/tractor.webp"  alt="Tractor" class="deco deco-tractor" />
+    <img src="images/decorados/arbol_2.webp"  alt="" class="deco deco-arbol-der1" />
+    <img src="images/decorados/arbol_1.webp"  alt="" class="deco deco-arbol-der2" />
+  </div>
+
+  <!-- Campos de cultivo – ocupan todo el ancho -->
+  <div id="zona-campos">
+    <div id="contenedor-campos">
+      <!-- Generado por Interfaz.js -->
+    </div>
+    
+    <!-- CORRAL (debajo del campo 3) -->
+    <div id="corral-terreno" aria-label="Corral de animales">
+      <h2 class="corral-terreno-titulo">🐄 Corral de Animales</h2>
+      <div class="corral-terreno-valla">
+        <img src="images/decorados/herramientas.webp" alt="Herramientas" class="corral-img" />
+        <span class="corral-badge">Próximamente... En Desarrollo</span>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<!-- ═══════ PANEL INFERIOR ════════════════════════════════════════
+     4 secciones en tarjetas: Semillas · Mejoras · Campos · Corral
+═══════════════════════════════════════════════════════════════ -->
+<footer id="panel-inferior">
+
+  <!-- SEMILLAS (Protagonista) -->
+  <section class="panel-seccion panel-seccion-semillas" id="seccion-semillas" aria-label="Semillas disponibles">
+    <div class="seccion-header">
+      <h2 class="panel-titulo">🌱 Semillas e Inventario</h2>
+      <p class="panel-instruccion">Selecciona para plantar · Compra para reabastecer</p>
+    </div>
+    <div class="tarjetas-scroll" id="lista-semillas">
+      <!-- Tarjetas generadas por Interfaz.js -->
+    </div>
+  </section>
+
+  <!-- MEJORAS -->
+  <section class="panel-seccion panel-seccion-mejoras" id="seccion-mejoras" aria-label="Mejoras de la granja">
+    <div class="seccion-header">
+      <h2 class="panel-titulo">🔧 Mejoras de Granja</h2>
+      <p class="panel-instruccion">Pasivas y utilidades</p>
+    </div>
+    <div class="tarjetas-scroll" id="lista-mejoras">
+      <!-- Tarjetas generadas por Interfaz.js -->
+    </div>
+  </section>
+
+</footer>
+
+<!-- Toast de feedback -->
+<div id="toast-feedback" class="toast-feedback oculto" role="alert" aria-live="polite">
+  <span id="toast-texto"></span>
+</div>
+
+<script type="module" src="scripts/Juego.js"></script>
+<script type="module" src="scripts/Corral.js"></script>
+</body>
+</html>
