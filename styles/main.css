@@ -1,0 +1,943 @@
+/* ═══════════════════════════════════════════════════════════════
+   main.css  –  Granja de Herencia Pixel  (v3)
+   Pixel-art farm — campos full-width, panel inferior en tarjetas
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Base ────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --px: 'Press Start 2P', monospace;
+  --amarillo:     #f5c800;
+  --amarillo2:    #ffe566;
+  --blanco:       #fef3dc;
+  --panel:        #1e110a;
+  --panel2:       #2d1a0e;
+  --panel-borde:  #7a4e20;
+  --tierra:       #c8914a;
+  --tierra2:      #8b5e2a;
+  --cesped:       #4e8030;
+  --cesped2:      #6aaa45;
+  --cielo:        #6ab4e8;
+  --rojo:         #e53935;
+  --azul:         #29b6f6;
+  --verde-ok:     #43a047;
+  --sombra:       4px 4px 0 #000;
+  --borde:        3px solid #000;
+  /* celda de parcela */
+  --celda-w: 80px;
+  --celda-h: 68px;
+}
+
+html { font-size: 13px; image-rendering: pixelated; }
+
+body {
+  font-family: var(--px);
+  background: var(--tierra);
+  color: var(--blanco);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   HUD SUPERIOR
+══════════════════════════════════════════════════════════════ */
+#hud-superior {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 1.8rem;
+  background: var(--panel);
+  border-bottom: 4px solid var(--amarillo);
+  box-shadow: 0 4px 0 #000;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  flex-wrap: wrap;
+  min-height: 58px;
+}
+
+.hud-izquierda { display: flex; align-items: center; gap: 0.8rem; }
+
+.hud-icono-img { height: 34px; image-rendering: pixelated; }
+
+.hud-titulo {
+  font-size: 0.9rem;
+  color: var(--amarillo);
+  text-shadow: 2px 2px 0 #000;
+  white-space: nowrap;
+}
+
+.hud-stats { display: flex; gap: 1rem; }
+
+.stat-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255,255,255,0.06);
+  border: 2px solid var(--panel-borde);
+  padding: 0.4rem 0.9rem;
+}
+
+.stat-icono { font-size: 1.4rem; }
+
+.stat-valor {
+  font-size: 1.15rem;
+  color: var(--amarillo2);
+  text-shadow: 2px 2px 0 #000;
+  min-width: 4ch;
+}
+
+.stat-nombre { font-size: 0.55rem; color: #999; letter-spacing: 0.1em; }
+
+.hud-mejoras { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+.mejora-chip {
+  background: var(--panel2);
+  border: 2px solid var(--panel-borde);
+  padding: 0.3rem 0.7rem;
+  font-size: 0.7rem;
+  color: var(--blanco);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ESCENA PRINCIPAL
+══════════════════════════════════════════════════════════════ */
+#escena-principal {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Fondo decorativo ────────────────────────────────────────── */
+#fondo-granja {
+  position: relative;
+  width: 100%;
+  height: 170px;
+  background-color: var(--cielo);
+  background-image: 
+    linear-gradient(to bottom, var(--cielo) 0%, #a8d8f0 55%, transparent 55%),
+    url('../images/suelos/prado_2.webp');
+  background-repeat: no-repeat, repeat;
+  background-position: top left, bottom left;
+  background-size: 100% 100%, 64px 64px;
+  image-rendering: pixelated;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Nubes */
+#fondo-granja::before {
+  content: '';
+  position: absolute;
+  top: 16px; left: -200px;
+  width: 110px; height: 36px;
+  background: rgba(255,255,255,0.88);
+  border-radius: 50px;
+  box-shadow: 170px 8px 0 rgba(255,255,255,0.72),
+              350px -4px 0 rgba(255,255,255,0.65),
+              540px 6px 0 rgba(255,255,255,0.78);
+  animation: nubes 38s linear infinite;
+}
+@keyframes nubes {
+  from { transform: translateX(0); }
+  to   { transform: translateX(115vw); }
+}
+
+/* Decoraciones */
+.deco {
+  position: absolute;
+  bottom: 0;
+  image-rendering: pixelated;
+  user-select: none;
+  pointer-events: none;
+}
+
+.deco-arbol-iz1  { left: 0%;   height: 128px; bottom: 4px; animation: mecerse 4s ease-in-out infinite; transform-origin: bottom center; }
+.deco-arbol-iz2  { left: 8%;   height: 108px; bottom: 6px; animation: mecerse 5.5s ease-in-out infinite 0.7s; transform-origin: bottom center; }
+.deco-silo       { left: 26%;  height: 148px; bottom: 0; }
+.deco-granja     { left: 50%;  transform: translateX(-50%); height: 162px; bottom: 0; filter: drop-shadow(3px 0 0 #000) drop-shadow(-3px 0 0 #000); }
+.deco-tractor    { right: 28%; height: 76px;  bottom: 14px; animation: tractor-bob 3s ease-in-out infinite; z-index: 10; }
+.deco-arbol-der1 { right: 5%;  height: 118px; bottom: 6px;  animation: mecerse 4.5s ease-in-out infinite 1s; transform-origin: bottom center; }
+.deco-arbol-der2 { right: 12%; height: 96px;  bottom: 10px; animation: mecerse 6s ease-in-out infinite 0.2s; transform-origin: bottom center; }
+
+@keyframes mecerse { 0%,100% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.5deg); } }
+@keyframes tractor-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+
+/* ── Zona de campos (full-width) ─────────────────────────────── */
+#zona-campos {
+  padding: 1.2rem 1.4rem 0.8rem;
+  background: linear-gradient(to bottom, var(--tierra) 0%, #a06828 100%);
+  flex: 1;
+}
+
+#contenedor-campos {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CAMPO – fila horizontal
+══════════════════════════════════════════════════════════════ */
+.campo-fila { position: relative; }
+
+.campo-etiqueta {
+  font-size: 0.8rem;
+  color: var(--amarillo);
+  text-shadow: 2px 2px 0 #000;
+  margin-bottom: 0.45rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.campo-etiqueta::before {
+  content: '';
+  display: inline-block;
+  width: 10px; height: 10px;
+  background: var(--amarillo);
+  border: 2px solid #000;
+}
+
+.campo-tira {
+  display: flex;
+  width: 100%;
+  border: var(--borde);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+  background: var(--tierra2);
+}
+
+/* Campo bloqueado */
+.campo-bloqueado .campo-tira {
+  filter: brightness(0.3) saturate(0.3);
+  pointer-events: none;
+}
+
+.campo-lock-overlay {
+  position: absolute;
+  inset: 0; top: 26px; /* debajo de la etiqueta */
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10,5,0,0.65);
+}
+
+.btn-comprar-campo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--panel);
+  border: 3px solid var(--panel-borde);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: transform 0.1s, filter 0.1s;
+  box-shadow: var(--sombra);
+}
+.btn-comprar-campo:hover {
+  transform: translateY(-4px) scale(1.02);
+  filter: brightness(1.2);
+  border-color: var(--amarillo);
+}
+.bcc-icono {
+  font-size: 1.5rem;
+}
+.bcc-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+}
+.bcc-titulo {
+  font-size: 0.65rem;
+  color: var(--blanco);
+  font-family: var(--px);
+  text-shadow: 1px 1px 0 #000;
+}
+.bcc-precio {
+  font-size: 0.75rem;
+  color: var(--amarillo2);
+  font-family: var(--px);
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PARCELA INDIVIDUAL
+══════════════════════════════════════════════════════════════ */
+.parcela {
+  position: relative;
+  flex: 1;          /* todas crecen igual para llenar el ancho */
+  min-width: 52px;
+  height: var(--celda-h);
+  cursor: pointer;
+  border-right: 2px solid rgba(0,0,0,0.4);
+  overflow: visible;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  transition: filter 0.1s;
+}
+.parcela:last-child { border-right: none; }
+.parcela:hover { filter: brightness(1.18); z-index: 10; }
+
+/* Suelo */
+.parcela-suelo {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+/* Planta flotante (sobresale hacia arriba) */
+.parcela-planta {
+  position: absolute;
+  bottom: 8px; /* Levantada ligeramente del suelo */
+  left: 50%;
+  transform: translateX(-50%);
+  height: calc(var(--celda-h) * 0.9); /* Más proporcionada, no gigantesca */
+  width: auto;
+  image-rendering: pixelated;
+  pointer-events: none;
+  z-index: 5;
+  transform-origin: bottom center;
+}
+
+/* ── Animaciones idle (PvZ style) ────────────────────────────── */
+.planta-idle {
+  animation: balanceo 3s ease-in-out infinite;
+}
+.planta-idle-rapido {
+  animation: balanceo 1.6s ease-in-out infinite;
+}
+@keyframes balanceo {
+  0%,100% { transform: translateX(-50%) rotate(-2deg) scaleX(1); }
+  25%     { transform: translateX(-50%) rotate(0deg)  scaleX(1.02); }
+  50%     { transform: translateX(-50%) rotate(2deg)  scaleX(1); }
+  75%     { transform: translateX(-50%) rotate(0deg)  scaleX(0.98); }
+}
+
+/* Planta lista → pulso dorado */
+.planta-lista {
+  animation: pulso-lista 0.85s ease-in-out infinite;
+  filter: drop-shadow(0 0 5px rgba(245,200,0,0.95));
+}
+@keyframes pulso-lista {
+  0%,100% { transform: translateX(-50%) scale(1); }
+  40%     { transform: translateX(-50%) scale(1.09) rotate(-1.5deg); }
+  70%     { transform: translateX(-50%) scale(1.09) rotate(1.5deg); }
+}
+
+/* Planta muerta */
+.planta-muerta-img {
+  filter: grayscale(1) sepia(0.4) brightness(0.55);
+}
+
+/* ── Barras de estado ────────────────────────────────────────── */
+.barras-wrapper {
+  position: absolute;
+  bottom: 2px; left: 2px; right: 2px;
+  z-index: 8;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.barra-track {
+  height: 5px;
+  background: rgba(0,0,0,0.75);
+  border: 1px solid rgba(0,0,0,0.9);
+  overflow: hidden;
+}
+.barra-fill { height: 100%; transition: width 0.3s linear; }
+.barra-track.crecer .barra-fill { background: #76c442; }
+.barra-track.agua   .barra-fill { background: var(--azul); }
+.barra-track.agua.peligro .barra-fill {
+  background: var(--rojo);
+  animation: parpadeo 0.4s step-start infinite;
+}
+@keyframes parpadeo { 0%,100% { opacity: 1; } 50% { opacity: 0.1; } }
+
+/* ── Hints de acción ─────────────────────────────────────────── */
+.parcela-accion-hint {
+  position: absolute;
+  top: 3px; right: 4px;
+  font-size: 1rem;
+  z-index: 9;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+  text-shadow: 1px 1px 0 #000;
+}
+.parcela:hover .parcela-accion-hint { opacity: 1; }
+
+/* ── Borde dorado cuando lista ───────────────────────────────── */
+.parcela.estado-lista { box-shadow: inset 0 0 0 3px var(--amarillo); }
+
+/* ── Muerta ──────────────────────────────────────────────────── */
+.parcela.estado-muerta::after {
+  content: '✖';
+  position: absolute;
+  top: 3px; left: 50%;
+  transform: translateX(-50%);
+  color: #ff5252;
+  font-size: 1rem;
+  z-index: 10;
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* ── Tooltip riego ───────────────────────────────────────────── */
+.tooltip-riego {
+  display: none;
+  position: absolute;
+  top: -24px; left: 50%;
+  transform: translateX(-50%);
+  background: #005fa3;
+  color: #fff;
+  font-size: 0.5rem;
+  padding: 2px 6px;
+  border: 1px solid #000;
+  white-space: nowrap;
+  z-index: 30;
+}
+.parcela:hover .tooltip-riego { display: block; }
+
+/* ══════════════════════════════════════════════════════════════
+   PANEL INFERIOR – TARJETAS
+══════════════════════════════════════════════════════════════ */
+#panel-inferior {
+  display: flex;
+  gap: 0;
+  background: var(--panel);
+  border-top: 4px solid var(--amarillo);
+  box-shadow: 0 -4px 0 #000;
+  min-height: 240px;
+  flex-shrink: 0;
+  align-items: stretch;
+}
+
+.panel-seccion {
+  padding: 1rem;
+  border-right: 4px solid #000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  min-width: 0;
+  background: linear-gradient(to bottom, var(--panel) 0%, #150a06 100%);
+}
+.panel-seccion:last-child { border-right: none; }
+
+.panel-seccion-semillas { flex: 5; } /* Más protagonismo */
+.panel-seccion-mejoras { flex: 4; }
+
+.seccion-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid var(--panel-borde);
+}
+
+.panel-titulo {
+  font-size: 1rem;
+  color: var(--amarillo);
+  text-shadow: 2px 2px 0 #000;
+  white-space: nowrap;
+}
+
+.panel-instruccion {
+  font-size: 0.65rem;
+  color: #b8b8b8;
+  line-height: 1.5;
+}
+
+/* ── SCROLL DE TARJETAS ──────────────────────────────────────── */
+.tarjetas-scroll {
+  display: flex;
+  gap: 0.9rem;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  flex: 1;
+  align-items: flex-start;
+}
+.tarjetas-scroll::-webkit-scrollbar { height: 5px; }
+.tarjetas-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+.tarjetas-scroll::-webkit-scrollbar-thumb { background: var(--panel-borde); border-radius: 3px; }
+
+/* ── TARJETA DE SEMILLA ──────────────────────────────────────── */
+.tarjeta-semilla-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.tarjeta-semilla {
+  position: relative;
+  width: 148px;
+  min-width: 148px;
+  background: var(--panel2);
+  border: 3px solid #000;
+  border-radius: 6px;
+  padding: 1rem 0.7rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+  transition: transform 0.15s, filter 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 18px rgba(0,0,0,0.5), var(--sombra);
+}
+.tarjeta-semilla:hover { transform: translateY(-5px); filter: brightness(1.15); border-color: #666; }
+.tarjeta-semilla.seleccionada {
+  border-color: var(--amarillo);
+  box-shadow: inset 0 0 20px rgba(245,200,0,0.2), 0 0 0 2px var(--amarillo), var(--sombra);
+  transform: translateY(-5px);
+}
+.tarjeta-semilla .ts-img {
+  width: 64px; height: 64px;
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+.tarjeta-semilla .ts-nombre {
+  font-size: 0.72rem;
+  color: var(--blanco);
+  text-shadow: 1px 1px 0 #000;
+  text-align: center;
+  line-height: 1.4;
+}
+.tarjeta-semilla .ts-stats {
+  font-size: 0.6rem;
+  color: #c0c0c0;
+  text-align: center;
+  line-height: 2;
+}
+/* Candado en tarjetas pendientes */
+.tarjeta-semilla.pendiente {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.tarjeta-semilla.pendiente:hover { transform: none; filter: none; }
+.tarjeta-semilla .ts-lock {
+  position: absolute;
+  top: 6px; right: 7px;
+  font-size: 1rem;
+}
+.tarjeta-semilla .ts-badge {
+  font-size: 0.5rem;
+  background: var(--rojo);
+  color: #fff;
+  padding: 3px 6px;
+  border: 1px solid #000;
+  text-align: center;
+  border-radius: 3px;
+}
+
+/* Cantidad en inventario */
+.ts-cantidad {
+  position: absolute;
+  top: 5px; left: 5px;
+  font-size: 0.65rem;
+  color: #fff;
+  background: var(--verde-ok);
+  padding: 2px 6px;
+  border: 1px solid #000;
+  border-radius: 4px;
+  line-height: 1.4;
+}
+/* Botón de compra */
+.ts-btn-comprar {
+  background: #3a2000;
+  color: var(--amarillo2);
+  border: 2px solid var(--amarillo);
+  font-size: 0.6rem;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
+  border-radius: 4px;
+  transition: background 0.12s, transform 0.08s;
+  text-align: center;
+  line-height: 1.5;
+}
+.ts-btn-comprar:hover {
+  background: #6b3800;
+  border-color: var(--amarillo2);
+}
+.ts-btn-comprar:active {
+  transform: scale(0.96);
+}
+
+/* ── TARJETA DE MEJORA ───────────────────────────────────────── */
+.tarjeta-mejora {
+  width: 168px;
+  min-width: 168px;
+  background: var(--panel2);
+  border: 3px solid #000;
+  border-radius: 6px;
+  padding: 1rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  cursor: pointer;
+  transition: transform 0.15s, filter 0.15s;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 18px rgba(0,0,0,0.5), var(--sombra);
+}
+.tarjeta-mejora:hover:not([disabled]) { transform: translateY(-5px); filter: brightness(1.15); border-color: #666; }
+.tarjeta-mejora[disabled] { opacity: 0.45; cursor: not-allowed; transform: none !important; filter: none !important; }
+
+.tarjeta-mejora .tm-icono { font-size: 2rem; text-align: center; margin-bottom: 0.2rem; }
+.tarjeta-mejora .tm-nombre {
+  font-size: 0.75rem;
+  color: var(--blanco);
+  text-shadow: 1px 1px 0 #000;
+  line-height: 1.5;
+  text-align: center;
+}
+.tarjeta-mejora .tm-nivel { font-size: 0.6rem; color: #bbb; text-align: center; }
+.tarjeta-mejora .tm-desc  { font-size: 0.55rem; color: #999; line-height: 1.6; text-align: center; }
+.tarjeta-mejora .tm-precio {
+  font-size: 0.7rem;
+  color: var(--amarillo2);
+  text-shadow: 1px 1px 0 #000;
+  margin-top: auto;
+  border-top: 2px solid var(--panel-borde);
+  padding-top: 0.4rem;
+  text-align: center;
+}
+
+/* (Tarjetas de campo eliminadas) */
+
+/* ── CORRAL EN EL TERRENO ───────────────────────────────────────── */
+#corral-terreno {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: var(--cesped);
+  background-image: url('../images/suelos/prado_3.webp');
+  background-repeat: repeat;
+  background-size: 64px 64px;
+  image-rendering: pixelated;
+  border: var(--borde);
+  box-shadow: var(--sombra);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+.corral-terreno-titulo {
+  font-size: 0.9rem;
+  color: var(--blanco);
+  text-shadow: 2px 2px 0 #000;
+}
+.corral-terreno-valla {
+  width: 100%;
+  min-height: 120px;
+  border: 4px dashed var(--tierra2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: rgba(0,0,0,0.1);
+}
+.corral-img { 
+  width: 64px; 
+  image-rendering: pixelated; 
+  animation: mecerse 4s ease-in-out infinite; 
+  transform-origin: bottom center; 
+}
+.corral-badge { 
+  font-size: 0.7rem; 
+  background: #555; 
+  color: #ccc; 
+  padding: 4px 10px; 
+  border: 2px solid #000; 
+}
+
+/* ── Tarjeta Bloqueo Corral ───────────────────────────────────── */
+.corral-bloqueo-card {
+  background: var(--panel2);
+  border: 3px solid #000;
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--sombra);
+  max-width: 500px;
+  text-align: center;
+}
+.corral-bloqueo-imagenes {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+}
+.corral-bloqueo-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+}
+.corral-bloqueo-desc {
+  font-size: 0.7rem;
+  color: var(--blanco);
+  line-height: 1.4;
+  text-shadow: 1px 1px 0 #000;
+}
+.corral-btn-desbloquear { margin-top: 0.5rem; }
+
+/* ── Layout principal del corral desbloqueado ─────────────────── */
+.corral-layout {
+  display: flex;
+  width: 100%;
+  gap: 0.8rem;
+  align-items: stretch;
+}
+
+/* Panel lateral izquierdo: tienda */
+.corral-panel-tienda {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background: rgba(0,0,0,0.55);
+  border: 3px solid #000;
+  border-radius: 8px;
+  padding: 0.8rem 0.6rem;
+  box-shadow: var(--sombra);
+  min-width: 130px;
+  max-width: 145px;
+  flex-shrink: 0;
+  align-items: center;
+}
+.corral-tienda-titulo {
+  font-size: 0.65rem;
+  color: var(--amarillo);
+  text-shadow: 1px 1px 0 #000;
+  text-align: center;
+  border-bottom: 2px solid var(--panel-borde);
+  padding-bottom: 0.4rem;
+  width: 100%;
+}
+.corral-btn-comprar {
+  background: var(--panel2);
+  border: 3px solid;
+  border-radius: 6px;
+  padding: 0.5rem 0.4rem;
+  color: var(--blanco);
+  font-family: var(--px);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  transition: transform 0.1s, filter 0.1s;
+  width: 100%;
+  box-shadow: var(--sombra);
+}
+.corral-btn-comprar:hover { transform: translateY(-3px) scale(1.03); filter: brightness(1.25); }
+.corral-btn-img { width: 42px; height: 42px; image-rendering: pixelated; object-fit: contain; }
+.corral-btn-nombre { font-size: 0.6rem; color: var(--blanco); text-shadow: 1px 1px 0 #000; }
+.corral-costo { color: var(--amarillo2); font-size: 0.65rem; }
+.corral-descripcion-mini { font-size: 0.48rem; color: #bbb; text-align: center; line-height: 1.4; }
+.corral-capacidad {
+  font-size: 0.55rem;
+  color: #aaa;
+  margin-top: auto;
+  text-align: center;
+}
+
+/* Zona del pasto donde los animales se mueven libremente */
+.corral-pasto {
+  flex: 1;
+  position: relative;
+  min-height: 160px;
+  border: 3px dashed rgba(0,0,0,0.4);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.corral-vacio {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.7);
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* Wrapper que recibe el scaleX del flip — solo afecta a la imagen, NO a las stats */
+.animal-flip-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s ease;
+}
+
+/* Sprite libre de animal */
+.animal-sprite {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: left 0.06s linear;  /* suavizado del movimiento */
+  cursor: default;
+}
+.animal-sprite-img {
+  width: 56px;
+  height: 56px;
+  image-rendering: pixelated;
+  object-fit: contain;
+  /* Bounce/walk animation */
+  animation: animal-walk 0.5s steps(1) infinite;
+}
+@keyframes animal-walk {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-3px); }
+}
+
+/* Stats flotantes encima del sprite */
+.animal-stats-flotantes {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.82);
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 4px 6px;
+  min-width: 90px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 0.48rem;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 30;
+}
+/* Mostrar stats al hover del sprite */
+.animal-sprite:hover .animal-stats-flotantes { opacity: 1; }
+/* También mostrar siempre si está triste */
+.animal-sprite:has(.stats-triste) .animal-stats-flotantes { opacity: 1; }
+
+.stats-nombre {
+  font-size: 0.55rem;
+  color: var(--amarillo2);
+  text-shadow: 1px 1px 0 #000;
+  text-align: center;
+  border-bottom: 1px solid #444;
+  padding-bottom: 2px;
+  margin-bottom: 1px;
+}
+.stats-label { color: var(--blanco); font-size: 0.48rem; }
+.stats-barra {
+  width: 100%;
+  height: 5px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid #000;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.stats-barra-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+.stats-barra-hambre  { background: #e67e22; }
+.stats-barra-progreso { background: #27ae60; }
+.stats-triste {
+  color: var(--rojo);
+  font-size: 0.52rem;
+  text-align: center;
+  text-shadow: 1px 1px 0 #000;
+  animation: parpadeo 0.6s step-start infinite;
+}
+
+/* Botón de alimentar debajo del sprite */
+.animal-btn-alimentar {
+  background: #7a4400;
+  border: 2px solid #f5c800;
+  color: var(--amarillo2);
+  font-family: var(--px);
+  font-size: 0.55rem;
+  padding: 3px 6px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: transform 0.1s, filter 0.1s;
+  white-space: nowrap;
+  box-shadow: 0 2px 0 #000;
+}
+.animal-btn-alimentar:hover { transform: scale(1.1); filter: brightness(1.3); }
+.animal-btn-alimentar:active { transform: scale(0.95); }
+
+/* Barras (legacy – usadas si algún alumno las referencia directamente) */
+.barra-contenedor { width: 100%; height: 6px; background: rgba(0,0,0,0.6); border: 1px solid #000; }
+.barra-relleno { height: 100%; transition: width 0.3s; }
+.barra-hambre { background: #e67e22; }
+.barra-progreso { background: #27ae60; }
+.animal-triste-aviso { color: var(--rojo); font-size: 0.55rem; background: rgba(0,0,0,0.8); padding: 3px 6px; border: 1px solid var(--rojo); border-radius: 3px; }
+
+/* ══════════════════════════════════════════════════════════════
+   TOAST FEEDBACK
+══════════════════════════════════════════════════════════════ */
+.toast-feedback {
+  position: fixed;
+  bottom: 230px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--panel);
+  border: 3px solid var(--amarillo);
+  color: var(--amarillo2);
+  padding: 0.8rem 2rem;
+  font-size: 0.8rem;
+  text-shadow: 1px 1px 0 #000;
+  z-index: 999;
+  box-shadow: var(--sombra);
+  max-width: 90vw;
+  text-align: center;
+  animation: slideUp 0.2s ease-out;
+}
+.toast-feedback.oculto { display: none; }
+@keyframes slideUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ── Partícula de oro ────────────────────────────────────────── */
+.particula-oro {
+  position: fixed;
+  font-size: 1.3rem;
+  pointer-events: none;
+  z-index: 999;
+  animation: flotar 1s ease-out forwards;
+}
+@keyframes flotar {
+  0%   { transform: translateY(0)    scale(1);   opacity: 1; }
+  100% { transform: translateY(-70px) scale(1.5); opacity: 0; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SCROLLBAR
+══════════════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #111; }
+::-webkit-scrollbar-thumb { background: var(--tierra2); border: 1px solid #000; }
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  :root { --celda-w: 60px; --celda-h: 56px; }
+  .deco-tractor { display: none; }
+}
+@media (max-width: 640px) {
+  :root { --celda-h: 48px; }
+  #panel-inferior { flex-wrap: wrap; }
+  .panel-seccion { min-width: 48%; border-right: none; border-bottom: 2px solid var(--panel-borde); }
+  .hud-titulo { display: none; }
+}
